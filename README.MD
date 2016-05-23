@@ -23,7 +23,7 @@ To write search patterns, you have to specify variables inside the cells and the
 
 Following are some tested patterns:
 - `<gPublish> L:List </gPublish> when 11 in L`, shows only what's in L.
-- `<T> B:Bag <gPublish> L:List </gPublish> </T> when L =/=K .List`, shows the whole solution when gpublish is not empty.
+- `<T> B:Bag <gPublish> L:List </gPublish> </T> when L =/=K .List`, shows `B` and `L` for solutions where gpublish is not empty.
 - `<gVars>... "BotVars" |-> (M:Map \"is_bumper_hit\" |-> B) </gVars> when B ==K true`, similarly, this shows what's in M and B.
 - `<T> B:Bag <gVars>... "BotVars" |-> (M:Map \"is_bumper_hit\" |-> Hit) </gVars> </T> when Hit ==K true`.
 
