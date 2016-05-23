@@ -1,0 +1,1 @@
+print("Success!") ; print("Failure!")
