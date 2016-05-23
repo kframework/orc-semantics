@@ -28,5 +28,5 @@ Following are some tested patterns:
 - `<T> B:Bag <gVars>... "BotVars" |-> (M:Map \"is_bumper_hit\" |-> Hit) </gVars> </T> when Hit ==K true`.
 
 Following are some wrong ways to write patterns:
-- `<gPublish> ListItem(11) </gPublish> // doesn't work`
-- `<gPublish> _:List </gPublish> // doesn't work`
+- `<gPublish> ListItem(11) </gPublish>`
+- `<gPublish> _:List </gPublish>`
