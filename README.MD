@@ -19,12 +19,12 @@ To run an Orc program
 ======================
 
 To write search patterns, you have to specify variables inside the cells and then check them using a `when`/`requires` condition. And the output will show only those variables specified. The pattern should be enclosed in double quotes. The command looks like: 
-`krun program.orc --search --pattern "thePattern"`
+`krun program.orc --search --pattern "thePattern"`.
 
 Following are some tested patterns:
 - `<gPublish> L:List </gPublish> when 11 in L`, shows only what's in L.
-- `<T> B:Bag <gPublish> L:List </gPublish> </T> when L =/=K .List`, shows `B` and `L` for solutions where gpublish is not empty.
-- `<gVars>... "BotVars" |-> (M:Map \"is_bumper_hit\" |-> Hit) </gVars> when Hit ==K true`, similarly, this shows `M` and `Hit`.
+- `<T> B:Bag <gPublish> L:List </gPublish> </T> when L =/=K .List`, shows `B` and `L` when `gpublish` is not empty.
+- `<gVars>... "BotVars" |-> (M:Map \"is_bumper_hit\" |-> Hit) </gVars> when Hit ==K true`, shows `M` and `Hit`.
 - `<T> B:Bag <gVars>... "BotVars" |-> (M:Map \"is_bumper_hit\" |-> Hit) </gVars> </T> when Hit ==K true`.
 
 Following are some wrong ways to write patterns:
