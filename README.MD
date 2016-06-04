@@ -3,6 +3,21 @@ See [LICENSE](LICENSE) for licensing information.
 Orc Semantics
 =============
 
+Orc is a minimal calculus for modeling concurrent sevice-oriented computations based on the theory of service orchestration by J. Misra. This project is a formal semantics of the Orc calculus written in K. 
+
+Relevant Publications
+---------------------
+- Orc's introductory paper: [Computaion Orchestration](http://dx.doi.org/10.1007/s10270-006-0012-1).
+- FM'15 conference paper: [Towards Formal Verification of Orchestration Computations Using the K Framework](http://dx.doi.org/10.1007/978-3-319-19249-9_4).
+- MS thesis: [A Formal Executable Semantics of Orc using the K Framework](http://dx.doi.org/10.13140/RG.2.1.3260.1203).
+
+Orc Language
+------------
+The [Orc programming language](https://orc.csres.utexas.edu/index.shtml) is based on the Orc calculus. This semantics does not cover all of the Orc language's constructs. However, because any program of the Orc language can be expressed in Orc calculus, this semantics can effectively be used to execute programs written in the Orc language.
+In this work, the term *Orc* refers to the Orc calculus.
+
+Instructions
+============
 This version of the Orc semantics uses version 3.5 of the K tool, which is the last version to support the Maude backend. Download it [here](http://github.com/kframework/k/releases/tag/v3.5.2).
 
 After placing K3.5's binaries in your path, you can use the following commands:
@@ -16,7 +31,7 @@ To run an Orc program
 	- `V`: Verbose, a boolean to show all threads even those that have finished execution, i.e., to not fire the cleanup rules.
 
 `krun` Search Patterns
-======================
+----------------------
 
 To write search patterns, you have to specify variables inside the cells and then check them using a `when`/`requires` condition. And the output will show only those variables specified. The pattern should be enclosed in double quotes. The command looks like: 
 `krun program.orc --search --pattern "thePattern"`.
