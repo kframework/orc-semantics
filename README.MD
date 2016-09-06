@@ -8,7 +8,7 @@ Orc is a minimal calculus for modeling concurrent sevice-oriented computations b
 Relevant Publications
 ---------------------
 - Orc's introductory paper: [Computaion Orchestration](http://dx.doi.org/10.1007/s10270-006-0012-1).
-- FM'15 conference paper: [Towards Formal Verification of Orchestration Computations Using the K Framework](http://dx.doi.org/10.1007/978-3-319-19249-9_4).
+- FM'15 conference paper: [Towards Formal Verification of Orchestration Computations using the K Framework](http://dx.doi.org/10.1007/978-3-319-19249-9_4).
 - MS thesis: [A Formal Executable Semantics of Orc using the K Framework](http://dx.doi.org/10.13140/RG.2.1.3260.1203).
 
 Orc Language
