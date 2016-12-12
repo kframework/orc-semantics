@@ -4,7 +4,6 @@
 require "modules/substitution.k"
 module ORC_EXPDEF
 	imports ORC_SYNTAX
-  imports MY_BUILTINS
 	imports SUBSTITUTION
 
 	//@ Translate Expression definitions to \texttt{def} cells
@@ -40,7 +39,7 @@ module ORC_EXPDEF
   syntax Exp ::= expCallPrep(Args, Exp, Params) [function]
   syntax Arg ::= Param2Arg(Param) [function]
   rule [Param-To-Arg]:
-		Param2Arg(P:CamelCaseId) => P [function,anywhere]
+		Param2Arg(P:Id) => P [function,anywhere]
   
   //@ A rule that uses substitution for expression calls. This runs recursively substituting each parameter in the body with the corresponding argument.
   rule [Expression-Call-Prep-2-Substitute]:

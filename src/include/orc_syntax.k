@@ -49,18 +49,17 @@ module ORC_SYNTAX
 	syntax ExpDef  ::= Decl ":=" Exp  
 	syntax Decl	   ::= ExpId "(" Params ")" [klabel(Decl)]
 	
-	syntax ExpId ::= PascalCaseId
+	syntax ExpId ::= Id
 	
 	/*@ \subsection{Parameters and Arguments}
 	\textit{Arguments} are what is called Actual Parameters in the Orc grammar, while our \textit{Parameters} are what they called Formal Parameters.
 	*/	
 	syntax Arg ::= Val
-				 // | "zero"
 				 | "clock"
-				 > CamelCaseId  //[binder]
+				 > Id  //[binder]
 				 > Tuple		// tuple of values
 				 > Call
-	syntax Param::= CamelCaseId
+	syntax Param::= Id
 	
 	//@ \subsection{Site Calls and Expression Calls}
 	syntax Call ::= SiteCall
@@ -76,8 +75,8 @@ module ORC_SYNTAX
 	syntax FreeHandle ::= handle(SiteCall)
 	syntax PubHandle ::= pubHandle(Val)  [klabel(pubHandle)]
 	syntax SilentHandle ::= silentHandle(SiteCall) [klabel(silentHandle)]
-	syntax TimedHandle ::= timedHandle(Float, SiteCall, Arg) [klabel(timedHandle)] // the klabel changes nothing regarding eagerness
-											 | timedHandle(Float, SiteCall)
+	syntax TimedHandle ::= timedHandle(Int, SiteCall, Arg) [klabel(timedHandle)] // the klabel changes nothing regarding eagerness
+											 | timedHandle(Int, SiteCall)
 	
 	syntax SiteId  ::= ISiteId	// Internal Site Identifier
 	syntax SiteId  ::= TSiteId	// Timed Sites
@@ -88,19 +87,15 @@ module ORC_SYNTAX
 	//@	Exclude reserved keywords from the Identifier category
 	syntax "signal" -/- [a-zA-Z0-9]
 	syntax "stop" -/- [a-zA-Z0-9]
-	syntax "tuple" -/- [a-zA-Z0-9]
-	syntax "clock" -/- [a-zA-Z0-9]
-	syntax "zero" -/- [a-zA-Z0-9]
-	syntax "count" -/- [a-zA-Z0-9]
 	
 	/*@ \subsection{KResult}
 	To tell \K what sorts are accepted as final evaluations of a \texttt{k} cell, we declare them as the \K built-in syntactic category \texttt{KResult}. Note that \textit{Val} is not accepted as a final evaluation because it is syntactic sugar for a call to $\mathit{let(v)}$ where \textit{v} is of sort \textit{Val}. However, \texttt{silentHandle} is accepted because otherwise the program will get stuck on sites that never respond.
 	*/
-	syntax KResult ::= SilentHandle
+	syntax KResult ::= SilentHandle | Val | Vals | Tuple
   
 	//@ \subsection{Secondary Syntax Productions}
 	//@ Variable is also a \K built-in syntactic category that is necessary when using the substitution module.
-	syntax Variable ::= CamelCaseId
+	syntax Variable
 	
 	//@ Sites/Expressions may publish a tuple of values. So, we declare lists to handle that in rules ahead.
 	syntax Exps ::= List{Exp,","}

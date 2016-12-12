@@ -2,7 +2,7 @@
 //mykrun test\test_ltlmc1.orc --ltlmc "[]Ltl isGPublished(3)"
 // or try the following ltl expressions:
 //<>Ltl isGPublished(3)
-//gVarEqTo(\"clock\",0)
+//gVarEq(\"clock\",0)
 
 
 DummyExp() := stop

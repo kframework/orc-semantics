@@ -27,7 +27,7 @@ require "include/orc_tsites.k"
 require "include/orc_robot.k"
 require "include/orc_math.k"
 require "include/orc_ltl.k"
-require "include/my_builtins.k"
+require "include/extras.k"
 require "include/orc_predicates.k"
 require "include/orc_varlookup.k"
 require "include/k35fix.k"
@@ -48,7 +48,7 @@ module ORC
 	imports ORC_ROBOT
 	imports ORC_MATH
 	imports ORC_LTL // OK to import for 3.6
-	imports MY_BUILTINS
+	imports EXTRAS
 	
 	//mutually-exclusive imports
 	imports K35FIX
@@ -99,10 +99,10 @@ module ORC
 			<gPublish color="Yellow"> .List </gPublish>
 			<gVars color="Salmon">
 				// "time.zero" |-> 0 /Rat 1 // a constant
-				"time.ticked" |-> (0.0)
-				"time.clock" |-> (0.0)
-				"time.MTE"   |-> $TL:Float // We initially want MTE to be infinity so we set to be the time limit.
-        "time.limit" |-> $TL:Float
+				"time.ticked" |-> (0)
+				"time.clock" |-> (0)
+				"time.MTE"   |-> $TL:Int // We initially want MTE to be infinity so we set to be the time limit.
+        "time.limit" |-> $TL:Int
         "publishCount" |-> 0
 				"count" |-> 0 // exclusively used by the site 'count'
 				// the following 4 are for sequential delta

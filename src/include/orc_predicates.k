@@ -75,9 +75,9 @@ module ORC_PREDICATES
 	rule anyTimedHandle(
 		_:Bag 					
 		<thread>... 
-			<k> timedHandle(I:Float,_,_) </k> 
+			<k> timedHandle(I:Int,_,_) </k> 
 		...</thread> 
-		) => true when I >Float 0.0
+		) => true when I >Int 0
 	rule anyTimedHandle(
 		_:Bag 					
 		<thread>... 
@@ -88,7 +88,7 @@ module ORC_PREDICATES
 	rule anyTimedHandle(
 		_:Bag 					
 		<thread>... 
-			<k> timedHandle(0.0,_,_) </k> 
+			<k> timedHandle(0,_,_) </k> 
 		...</thread> 
 		) => false
 	
@@ -146,13 +146,13 @@ module ORC_PREDICATES
 	[owise]
 
 	//@\par Is there any thread that has a timed handle less than MTEtemp
-	syntax Bool ::= anyLesserTE(Float,Bag) [function]
-	rule anyLesserTE(MTEtemp:Float,
+	syntax Bool ::= anyLesserTE(Int,Bag) [function]
+	rule anyLesserTE(MTEtemp:Int,
 		_:Bag
 		<thread>... 
-			<k> timedHandle(I:Float,_,_) </k> 
+			<k> timedHandle(I:Int,_,_) </k> 
 		...</thread> 
-		) => true when I <Float MTEtemp andBool I >Float 0.0
+		) => true when I <Int MTEtemp andBool I >Int 0
 	rule anyLesserTE(_,
 		_:Bag
 		<thread>... 
@@ -161,12 +161,12 @@ module ORC_PREDICATES
 		) => false
 	[owise]
 	
-	syntax Float ::= getLesserTE(Float,Bag) [function]
-	rule getLesserTE(MTEtemp:Float,
+	syntax Int ::= getLesserTE(Int,Bag) [function]
+	rule getLesserTE(MTEtemp:Int,
 		_:Bag
 		<thread>... 
-			<k> timedHandle(I:Float,_,_) </k> 
+			<k> timedHandle(I:Int,_,_) </k> 
 		...</thread> 
-		) => I when I <Float MTEtemp andBool I >Float 0.0
+		) => I when I <Int MTEtemp andBool I >Int 0
 	
 endmodule

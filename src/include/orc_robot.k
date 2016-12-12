@@ -1,14 +1,14 @@
 	//@ \section{Bot Environment}
 module ORC_ROBOT
 	imports ORC_SYNTAX
-	imports MY_BUILTINS
+	imports EXTRAS
 		
 	// I need to make the expression (bot.rotateLeft | bot.rotateRight) go either left or right nondeterminisically.
 	// ok how to do it: only the handle that has control will move the bot and publish signal. handle that has no control will become silent. handle finishing time, will release THE control.
 	// maybe the robot should be one site and the command be its argument
 	
 	//@ Define a special category of sites that deals with locks
-	syntax Arg ::= "bot_lock"
+	syntax Arg ::= "botHandle"
 	syntax TSiteId ::= BotTSite 
 	
 	//@ \subsection{Internal Bot Sites}
@@ -127,11 +127,12 @@ module ORC_ROBOT
 	rule
 		<k> handle(bot.scan(.Args)) => handle(bot.scan("Default")) ...</k> [macro]
 	rule 
-		<k> handle(bot.scan(S:String)) => timedHandle(1.0, bot.scan(S), bot_lock) ...</k>
-			 // we don't need to lock the bot here, because it should be able to scan and start moving simultaneously. the arg "bot_lock" needs another name to remove confusion. TODO.
+		<k> handle(bot.scan(S:String)) => timedHandle(1, bot.scan(S), botHandle) ...</k>
+			 // we don't need to lock the bot here, because it should be able to scan and start moving simultaneously. 
+			 // the arg botHandle is just there to keep the rule TimedHandle-Outro from applying. It could be any dummy argument, but the point is that it is not a Val. 
 		[structural]
 	rule
-		<k> timedHandle(0.0, bot.scan(S), bot_lock) => timedHandle(0.0, bot.scan(S), (checkWall(vSub(vAdd(Pos,Dir),Dims)) orBool checkBlock(vAdd(Pos,Dir),Obs)) ) </k>
+		<k> timedHandle(0, bot.scan(S), botHandle) => timedHandle(0, bot.scan(S), (checkWall(vSub(vAdd(Pos,Dir),Dims)) orBool checkBlock(vAdd(Pos,Dir),Obs)) ) </k>
 		<gVars>...
 			("bot.map_size" |-> Dims:List)
 			("bot.map_obstacles" |-> Obs:List)
@@ -196,7 +197,7 @@ module ORC_ROBOT
 	rule
 		<k> handle(bot.stepFwd(.Args)) => handle(bot.stepFwd("Default")) ...</k> [macro]
 	rule [bot-stepFwd]:
-		<k> handle(bot.stepFwd(S:String)) => timedHandle(3.0, bot.stepFwd(S), bot_lock) </k>
+		<k> handle(bot.stepFwd(S:String)) => timedHandle(3, bot.stepFwd(S), botHandle) </k>
 		<gVars>
 			(Lock |-> (false => true))
 			(Bumper |-> (_ => false))
@@ -220,7 +221,7 @@ module ORC_ROBOT
 	
 	//@ Stepped forward and not hit a wall or block
 	rule [Step-Done-No-Hit]:
-		<k> timedHandle(0.0, bot.stepFwd(S:String), _) => botMoved(S, true) </k>
+		<k> timedHandle(0, bot.stepFwd(S:String), _) => botMoved(S, true) </k>
 		<gVars> 
 			(PosStr |-> (Pos => vAdd(Pos,Dir)))
 			(DirStr |-> Dir)
@@ -237,7 +238,7 @@ module ORC_ROBOT
 	
 	//@ Tried to step forward but hit a wall or block
 	rule [No-Step-Cause-Hit]:
-		<k> timedHandle(0.0, bot.stepFwd(S:String), _) => botMoved(S, true) </k>
+		<k> timedHandle(0, bot.stepFwd(S:String), _) => botMoved(S, true) </k>
 		<gVars>
 			(Bumper |-> (_ => true))
 			"bot.map_obstacles" |-> Obs:List
@@ -255,7 +256,7 @@ module ORC_ROBOT
 	rule [bot-rotateRight]:
 		<k> handle(bot.rotateRight(.Args)) => handle(bot.rotateRight("Default")) ...</k> [macro]
 	rule 
-		<k> handle(bot.rotateRight(S:String)) => timedHandle(1.0, bot.rotateRight(S), bot_lock) </k>
+		<k> handle(bot.rotateRight(S:String)) => timedHandle(1, bot.rotateRight(S), botHandle) </k>
 		<gVars> 
 			Lock |-> (false => true)
 		...</gVars>
@@ -263,7 +264,7 @@ module ORC_ROBOT
 		[transition]
 	
 	rule
-		<k> timedHandle(0.0, bot.rotateRight(S:String),_) => botMoved(S, true) </k>
+		<k> timedHandle(0, bot.rotateRight(S:String),_) => botMoved(S, true) </k>
 		<gVars> 
 			(DirStr |-> (Direction => cw(Direction)))
 			(Bumper |-> (_ => false))
@@ -277,14 +278,14 @@ module ORC_ROBOT
 	rule [bot-rotateLeft]:
 		<k> handle(bot.rotateLeft(.Args)) => handle(bot.rotateLeft("Default")) ...</k> [macro]
 	rule 
-		<k> handle(bot.rotateLeft(S:String)) => timedHandle(1.0,bot.rotateLeft(S), bot_lock) </k>
+		<k> handle(bot.rotateLeft(S:String)) => timedHandle(1,bot.rotateLeft(S), botHandle) </k>
 		<gVars> 
 			Lock |-> (false => true)
 		...</gVars>
 		when Lock ==String botStr(S,"bot_lock")
 		[transition]
 	rule
-		<k> timedHandle(0.0, bot.rotateLeft(S:String),_) => botMoved(S, true) </k>
+		<k> timedHandle(0, bot.rotateLeft(S:String),_) => botMoved(S, true) </k>
 		<gVars> 
 			(DirStr |-> (Direction => ccw(Direction)))
 			(Bumper |-> (_ => false))

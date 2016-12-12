@@ -10,7 +10,7 @@ module ORC_PUB
 		<threads>
 			A:Bag
 			<thread>...
-				<k> pubHandle(V:Val) => .K </k>
+				<k> pubHandle(V:Val) => .K ...</k>
 				<publish>... .List => ListItem(V) </publish>
 			...</thread>
 		</threads>

@@ -29,15 +29,17 @@ module ORC_LTL
 
   syntax Prop ::= Id
                 // | "eqToSum" "(" Id "," Id ")"
-                | "gVarEqTo" "(" String "," Val ")"
-                | "gVarEqTo" "(" String "," Tuple ")"
-                | "gVarEqTo" "(" String "," List ")"
+                | "gVarEq" "(" String "," Val ")"
+                | "gVarEq" "(" String "," Tuple ")"
+                | "gVarEq" "(" String "," List ")"
+                | "gVarNeq" "(" String "," Val ")" 
+                | "gVarNeq" "(" String "," Tuple ")" 
+                | "gVarNeq" "(" String "," List ")" 
                 // | "logInv" "(" Id "," Id "," Id ")"
-                // |  "lt" "(" Id "," Val ")" 
-                // |  "leq" "(" Id "," Val ")" 
-                // |  "gt" "(" Id "," Val ")" 
-                // |  "geq" "(" Id "," Val ")" 
-                // |  "neqTo" "(" Id "," Val ")" 
+                | "gVarLt" "(" String "," Int ")" 
+                | "gVarLeq" "(" String "," Int ")" 
+                | "gVarGt" "(" String "," Int ")" 
+                | "gVarGeq" "(" String "," Int ")" 
                 // |  "eq" "(" Id "," Id ")"
                 | "isGPublished" "(" Int ")"
 
@@ -56,13 +58,12 @@ module ORC_LTL
 			L:Id : E:Exp => E  [transition]
 
   /*@
-    In order to give semantics to the proposition \texttt{gVarEqTo}, we use 
+    In order to give semantics to the proposition \texttt{gVarEq}, we use 
     auxiliary functions like \texttt{gVarGet} that returns a certain value 
     from inside a given configuration: 
    */
 
   syntax Arg ::= "gVarGet" "(" Bag "," String ")" [function]
-
   rule [LTL-gVarGet]:
 		gVarGet(
 			<generatedTop>... 
@@ -73,8 +74,18 @@ module ORC_LTL
 			, S
 		) => A
 
-  syntax List ::= "gPublishGet" "(" Bag ")" [function]
+  syntax Int ::= "gVarGetInt" "(" Bag "," String ")" [function]
+  rule [LTL-gVarGetInt]:
+		gVarGet(
+			<generatedTop>... 
+				<T>...
+          <gVars>... S:String |-> I:Int ...</gVars> 
+        ...</T> 
+			...</generatedTop>
+			, S
+		) => I
 
+  syntax List ::= "gPublishGet" "(" Bag ")" [function]
   rule [LTL-gPublishGet]:
 		gPublishGet(
 			<generatedTop>... 
@@ -98,10 +109,19 @@ module ORC_LTL
     We are ready now to give the semantics for atomic propositions:
    */
 
-  rule [LTL-gVarEqTo]: B:Bag |=Ltl gVarEqTo(S:String, V:Val) => true requires gVarGet(B, S) ==K V [ltl, anywhere]
-  rule [LTL-gVarEqTo]: gVarEqTo(S:String, T:Tuple) => gVarEqTo(S, tuple2Klist(T)) [macro]
-  rule [LTL-gVarEqTo]: B:Bag |=Ltl gVarEqTo(S:String, L:List) => true requires gVarGet(B, S) ==K L [ltl, anywhere]
+  rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S:String, V:Val) => true requires gVarGet(B, S) ==K V [ltl, anywhere]
+  rule [LTL-gVarEq]: gVarEq(S:String, T:Tuple) => gVarEq(S, tuple2Klist(T)) [macro]
+  rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S:String, L:List) => true requires gVarGet(B, S) ==K L [ltl, anywhere]
+  rule [LTL-gVarNeq]: B:Bag |=Ltl gVarNeq(S:String, V:Val) => true requires gVarGet(B, S) =/=K V [ltl, anywhere]
+  rule [LTL-gVarNeq]: gVarNeq(S:String, T:Tuple) => gVarNeq(S, tuple2Klist(T)) [macro]
+  rule [LTL-gVarNeq]: B:Bag |=Ltl gVarNeq(S:String, L:List) => true requires gVarGet(B, S) =/=K L [ltl, anywhere]
   rule [LTL-isGPublished]: B:Bag |=Ltl isGPublished(I:Int) => true requires I in gPublishGet(B) [ltl, anywhere]
+
+  rule [LTL-gVarLt]: B:Bag |=Ltl gVarLt(S:String, V:Int) => true requires gVarGetInt(B, S) <Int V [ltl, anywhere]
+  rule [LTL-gVarLeq]: B:Bag |=Ltl gVarLeq(S:String, V:Int) => true requires gVarGetInt(B, S) <=Int V [ltl, anywhere]
+  rule [LTL-gVarGt]: B:Bag |=Ltl gVarGt(S:String, V:Int) => true requires gVarGetInt(B, S) >Int V [ltl, anywhere]
+  rule [LTL-gVarGeq]: B:Bag |=Ltl gVarGeq(S:String, V:Int) => true requires gVarGetInt(B, S) >=Int V [ltl, anywhere]
+
   // rule [LTL-neqTo]: B:Bag |=Ltl neqTo(X:Id, I:Int) => true requires gVarGet(B, X) =/=Int I [ltl, anywhere]
   // rule [LTL-lt]: B:Bag |=Ltl lt(X:Id, I:Int) => true requires gVarGet(B, X) <Int I [ltl, anywhere]
   // rule [LTL-leq]: B:Bag |=Ltl leq(X:Id, I:Int) => true requires gVarGet(B, X) <=Int I [ltl, anywhere]

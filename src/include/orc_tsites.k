@@ -20,7 +20,7 @@ module ORC_TSITES
 	rule [Site-Clock]:
 		<k> handle(Clock(.Args)) => pubHandle(T) ...</k>
 		<gVars>... 
-			"time.clock" |-> T:Float
+			"time.clock" |-> T:Int
 		...</gVars>
 	[structural]
 	
@@ -28,16 +28,16 @@ module ORC_TSITES
 	//@\textit{Rtimer(t)} publishes a signal after \textit{t} time units.\\
 	syntax TSiteId  ::= "Rtimer" // The most fundamental timed site	
   rule [Rtimer]:
-    <k> handle(Rtimer(I:Float)) => timedHandle(I, Rtimer(0.0), signal) </k> 
+    <k> handle(Rtimer(I:Int)) => timedHandle(I, Rtimer(0), signal) </k> 
 		[structural]
 	
 	//@\textit{Atimer(t)} publishes a signal at time \textit{t}.\\
 	//@ We write \textit{Atimer} in terms of \textit{Rtimer}
 	syntax TSiteId  ::= "Atimer"
 	rule [Atimer]:
-    <k> handle(Atimer(T:Float)) => timedHandle(T -Float Clk, Atimer(0.0), signal) ...</k>
-    <gVars>... "time.clock" |-> Clk:Float ...</gVars>
-    when T >Float Clk 
+    <k> handle(Atimer(T:Int)) => timedHandle(T -Int Clk, Atimer(0), signal) ...</k>
+    <gVars>... "time.clock" |-> Clk:Int ...</gVars>
+    when T >Int Clk 
     [structural]
 
 endmodule

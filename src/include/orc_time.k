@@ -16,52 +16,84 @@ module ORC_TIME
 		</threads> <br/>
 		<gVars>
 			...
-			"time.ticked" |-> 0.0
-			"time.MTE" |-> (MTE:Float => getLesserTE(MTE,A))
+			"time.ticked" |-> 0
+			"time.MTE" |-> (MTE:Int => getLesserTE(MTE,A))
 			...
 		</gVars>
 		when anyLesserTE(MTE,A) andBool notBool(anySiteCall(A)) 
 	[structural]
 		
+	syntax Int ::= myMinInt(Int, Int) [function]
+	rule myMinInt(A,B) => #if A <Int B #then A #else B #fi
+	
 	rule [Tick-Clock]:
 		<threads>
 			A:Bag
 		</threads> <br/>
 		<gVars>
 			...
-			"time.ticked" |-> (0.0 => MTE)
-			"time.clock" |-> (Clk:Float => Clk +Float MTE)
-			"time.limit" |-> TL:Float
-			"time.MTE"   |-> MTE:Float
+			"time.ticked" |-> (0 => myMinInt(MTE, TL -Int Clk))
+			"time.clock" |-> (Clk:Int => myMinInt(Clk +Int MTE, TL))
+			"time.limit" |-> TL:Int
+			"time.MTE"   |-> MTE:Int
 			...
 		</gVars>
 		// <out>... 
 			// .List => ListItem("Ticking ") ListItem(Clk)
 		// </out>
-		when MTE >Float 0.0
+		when MTE >Int 0
+			// andBool MinTick ==Int minInt(MTE, TL -Int Clk)
+			// andBool MinClk ==Int minInt(Clk +Int MTE, TL)
 			andBool notBool anyLesserTE(MTE,A)
-			andBool((Clk +Float MTE) <Float TL)
+			// andBool((Clk +Int MTE) <Int TL)
 			andBool notBool(anySiteCall(A)) 
 			andBool notBool(anyFreeHandle(A)) 
 			andBool notBool(anyPubHandle(A)) 
-			andBool anyTimedHandle(A)
+			// andBool anyTimedHandle(A) // I removed this because I want time to pass regardless of timed site calls. This will ensure that the program always terminates, given the TTL-terminate rule.
 			andBool notBool(anyAppliedDelta(A))
 	[transition] //WARNING: When this is structural, it will happen even if a timedHandle is ready to publish when other timedHandles still need ticks. Also all timedHandles reaching 0 will not publish!
 	
+	// when no pubHandles and no site calls, but only silentHandles, and managers and freeHandles that are effectively silent, then just terminate all threads.
+	// WARNING: This is a dangerous rule that takes more control than it should. There bound to be some error spawning from this.
+	rule [TTL-terminate]:
+		<threads> A:Bag </threads>
+		<gVars>
+			...
+			"time.clock" |-> TL:Int
+			"time.limit" |-> TL:Int
+			"terminate" |-> (false => true)
+			...
+		</gVars>
+		when notBool(anySiteCall(A)) 
+		andBool notBool(anyFreeHandle(A)) 
+		andBool notBool(anyPubHandle(A)) 
+	[transition]
+	
+	rule [execute-terminate]:
+		<threads>...
+			<thread>...
+				<k> _:SilentHandle => .K </k>
+				<publish> .List </publish>
+			...</thread>
+		...</threads>
+		<gVars>...
+			"terminate" |-> true
+		...</gVars>
+	[structural]
 	
 	// WARNING: I want this applying concurrently. Apparently it is not. 
 	rule [Apply-Delta]:
 		<thread>...
-			<k> timedHandle(I:Float, SC, A) => timedHandle(I -Float TE, SC, A) </k> <br/>
+			<k> timedHandle(I:Int, SC, A) => timedHandle(I -Int TE, SC, A) </k> <br/>
 			<props> S:Set (.Set => SetItem("applied_delta")) </props>
 		...</thread>
 		<gVars>... 
-			"time.ticked" |-> TE:Float
+			"time.ticked" |-> TE:Int
 		...</gVars>
 		// <out>... 
 			// .List => ListItem("One timedHandle applying Delta")
 		// </out>
-		when I >Float 0.0 andBool TE >Float 0.0 andBool notBool("applied_delta" in S)
+		when I >Int 0 andBool TE >Int 0 andBool notBool("applied_delta" in S)
 	[structural]
 	
 	// even though rule apply-delta is not applying concurrently, the side condition here will ensure this doesn't fire while apply-delta is still doing its work.
@@ -70,14 +102,14 @@ module ORC_TIME
 			A:Bag
 		</threads>
 		<gVars>... 
-			"time.ticked" |-> (T:Float => 0.0)
-			"time.MTE" |-> (_:Float => TL)
-			"time.limit" |-> TL:Float
+			"time.ticked" |-> (T:Int => 0)
+			"time.MTE" |-> (_:Int => TL)
+			"time.limit" |-> TL:Int
 		...</gVars>
 		// <out>... 
 			// .List => ListItem("Delta Off!")// This is very strange. Change the string and it won't compile!
 		// </out>
-		when T >Float 0.0 andBool allAppliedDelta(A)
+		when T >Int 0 andBool allAppliedDelta(A)
 	[structural]
 	
 	// rule after delta done, to remove the flag from timed handles that applied delta
@@ -88,7 +120,7 @@ module ORC_TIME
 			<props>... SetItem("applied_delta") => .Set ...</props>
 		...</thread>
 		<gVars>... 
-			"time.ticked" |-> 0.0
+			"time.ticked" |-> 0
 		...</gVars>
 		// <out>... 
 			// .List => ListItem("One timedHandle is ready to publish or Delta again")
@@ -96,9 +128,9 @@ module ORC_TIME
 	[structural]
 
 	rule [TimedHandle-Outro]:
-		<k> timedHandle(0.0,_,V:Val) => pubHandle(V) </k>
+		<k> timedHandle(0,_,V:Val) => pubHandle(V) </k>
 		<gVars>...
-			"time.ticked" |-> 0.0
+			"time.ticked" |-> 0
 		...</gVars>		
 		// <out>... 
 			// .List => ListItem("One timedHandle published") ListItem("\n")

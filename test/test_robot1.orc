@@ -21,7 +21,7 @@ SmartStep4Ever(b) :=  SmartStep(b) >> SmartStep4Ever(b)
 
 //=======================
 // let't try ltlmc.
-// krun35 test\test_robot1.orc --ltlmc "<>Ltl gVarEqTo(\"bot.yourCow.is_bumper_hit\",false)"
+// krun35 test\test_robot1.orc --ltlmc "<>Ltl gVarEq(\"bot.yourCow.is_bumper_hit\",false)"
 // bot.mapInit(<6,6>) >> bot.setObstacles(<2,1>,<4,2>) >> bot.init("yourCow",<2,0>,<0,1>) >> SmartStep("yourCow") >> SmartStep("yourCow") >> SmartStep("yourCow") // ltlmc returned true in seconds
 // bot.mapInit() >> bot.setObstacles(<5,1>) >> (bot.init("myCow") | bot.init("yourCow",<5,0>,<0,1>)) > x > SmartStep(x) // ltlmc returns true in seconds
 bot.mapInit(<6,6>) >> bot.setObstacles(<2,1>,<4,2>) >> bot.init("yourCow",<2,0>,<0,1>) > x > (SmartStep(x) >> SmartStep(x)) // ltlmc takes a matter of seconds, return true.

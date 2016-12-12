@@ -1,8 +1,6 @@
 //@ \section{Orc's Combinators}	
-require "my_builtins.k"
 module ORC_OPS
 	imports ORC_SYNTAX
-	imports MY_BUILTINS
 	
 	
 	//======================PARALLEL===========================
@@ -226,7 +224,7 @@ module ORC_OPS
 	//@ In case of $f \gg g$, we expand it to the general format.
 	// case >>
 	rule [Sequential-NoVar-Prep]:
-    F >> G => F > String2CamelCaseId("dummy_var") > G	[macro]
+    F >> G => F > String2Id("dummy_var") > G	[macro]
 	// rule V:Val ~> E:Exp => E	[structural]
 	
 	/*@
@@ -367,7 +365,7 @@ module ORC_OPS
 	
 	//@ Here is a rule to handle $\ll$
 	rule [Pruning-NoVar-Prep]:
-	F << G => F < String2CamelCaseId("dummy_var") < G	[macro]
+	F << G => F < String2Id("dummy_var") < G	[macro]
 
 	
 	/*@
