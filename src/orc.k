@@ -4,7 +4,7 @@ Semantics of the Orc Calculus.
 /*!
 \setlength{\parindent}{1em}
 \title{\K-Semantics of Orc}
-\author{Omar Alzuhaibi (\texttt{omar.zud@gmail.com})}
+\author{Omar al-Zuhaibi (\texttt{3omarz@gmail.com})}
 \organization{King Fahd University of Petroleum and Minerals}
 */
 /*
