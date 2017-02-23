@@ -20,13 +20,13 @@ Instructions
 ============
 This version of the Orc semantics uses version 3.5 of the K tool, which is the last version to support the Maude backend. Download it [here](http://github.com/kframework/k/releases/tag/v3.5.2).
 
-After placing K3.5's binaries in your path, you can use the following commands:
+After placing K3.5's binaries folder `k/bin` in your environment path, you can use the following commands:
 
 To compile
-- `kompile src\orc.k`
+- `kompile src/orc.k`
 
 To run an Orc program
-- `krun test\orcexmp1.orc -cTL=30 -cV=false`
+- `krun test/orcexmp1.orc -cTL=30 -cV=false`
 	- `TL`: Time Limit, the maximum logical time allowed. After that the program will not progress time further, and will halt.
 	- `V`: Verbose, a boolean to show all threads even those that have finished execution, i.e., to not fire the cleanup rules.
 
