@@ -40,4 +40,8 @@ module ORC_TSITES
     when T >Int Clk 
     [structural]
 
+	//@ The following rule halts silent sites after one time unit. This is the closest I have to a timeout. I need this so that programs complete execution. But even better is that instead I use the time-limit-reached rule in the time modlue.
+	// rule [Timeout]:
+		// K:SilentHandle => Rtimer(1) >> stop
+	
 endmodule

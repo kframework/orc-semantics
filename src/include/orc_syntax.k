@@ -56,6 +56,7 @@ module ORC_SYNTAX
 	*/	
 	syntax Arg ::= Val
 				 | "clock"
+				 | "stop"
 				 > Id  //[binder]
 				 > Tuple		// tuple of values
 				 > Call
@@ -83,10 +84,11 @@ module ORC_SYNTAX
   syntax ISiteId // to define ISiteId and TSiteId as sorts here in the syntax module
   syntax TSiteId
 	//@ \subsection{Values}
-	syntax Val ::= Int | Float | Bool | String | "signal" | "stop"
+	syntax Val ::= Int | Float | Bool | String | "signal"
 	//@	Exclude reserved keywords from the Identifier category
 	syntax "signal" -/- [a-zA-Z0-9]
 	syntax "stop" -/- [a-zA-Z0-9]
+	// syntax "silent" -/- [a-zA-Z0-9]
 	
 	/*@ \subsection{KResult}
 	To tell \K what sorts are accepted as final evaluations of a \texttt{k} cell, we declare them as the \K built-in syntactic category \texttt{KResult}. Note that \textit{Val} is not accepted as a final evaluation because it is syntactic sugar for a call to $\mathit{let(v)}$ where \textit{v} is of sort \textit{Val}. However, \texttt{silentHandle} is accepted because otherwise the program will get stuck on sites that never respond.

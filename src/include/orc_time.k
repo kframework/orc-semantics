@@ -55,13 +55,14 @@ module ORC_TIME
 	
 	// when no pubHandles and no site calls, but only silentHandles, and managers and freeHandles that are effectively silent, then just terminate all threads.
 	// WARNING: This is a dangerous rule that takes more control than it should. There bound to be some error spawning from this.
-	rule [TTL-terminate]:
+	// WARNING: I'm deleting the time limit and I don't know why. I just did it by mistake and the Time-limit-reached rule worked. But When I don't delete it, it keeps running forever probably because of some rule applying forever.
+	rule [Time-limit-reached]:
 		<threads> A:Bag </threads>
 		<gVars>
 			...
 			"time.clock" |-> TL:Int
-			"time.limit" |-> TL:Int
-			"terminate" |-> (false => true)
+			("time.limit" |-> TL:Int
+			.Map => "time.limit.reached" |-> true)
 			...
 		</gVars>
 		when notBool(anySiteCall(A)) 
@@ -69,7 +70,7 @@ module ORC_TIME
 		andBool notBool(anyPubHandle(A)) 
 	[transition]
 	
-	rule [execute-terminate]:
+	rule [Apply-TTL]:
 		<threads>...
 			<thread>...
 				<k> _:SilentHandle => .K </k>
@@ -77,7 +78,7 @@ module ORC_TIME
 			...</thread>
 		...</threads>
 		<gVars>...
-			"terminate" |-> true
+			"time.limit.reached" |-> true
 		...</gVars>
 	[structural]
 	

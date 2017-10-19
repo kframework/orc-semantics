@@ -9,6 +9,11 @@ module ORC_VARLOOKUP
 		<k> X:Param => V ...</k>
 		<context>... X |-> V:Val ...</context>
 	[structural]
+	
+endmodule
+
+module ORC_VARSCOPE
+	imports ORC_SYNTAX
 	//TODO: expression calls enforce variable names prefix
 	//@ Register a \texttt{varReq} in parent when not finding needed variable, and not expecting the variable to be provided by a managing parent.
 	syntax Param ::= varReq(Param, Int)  [function] // the int arg is the state number to keep track to not check more than once unless a transition has happened.

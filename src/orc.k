@@ -44,6 +44,7 @@ module ORC
 	imports ORC_ISITES
 	imports ORC_TSITES 
 	imports ORC_VARLOOKUP
+	imports ORC_SCOPESHARE
 	imports ORC_PREDICATES
 	imports ORC_ROBOT
 	imports ORC_MATH
@@ -102,8 +103,8 @@ module ORC
 				"time.ticked" |-> (0)
 				"time.clock" |-> (0)
 				"time.MTE"   |-> $TL:Int // We initially want MTE to be infinity so we set to be the time limit.
-        "time.limit" |-> $TL:Int
-        "publishCount" |-> 0
+				"time.limit" |-> $TL:Int
+				"publishCount" |-> 0
 				"count" |-> 0 // exclusively used by the site 'count'
 				// the following 4 are for sequential delta
 				// "threads_applied_delta" |-> 0  

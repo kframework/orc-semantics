@@ -30,7 +30,8 @@ module ORC_ISITES
 	*/
 	rule [Val-stop-1]: A:Arg,stop => stop	[anywhere]
 	rule [Val-stop-2]: stop,A:Arg => stop	[anywhere]
-	rule [Val-stop-3]: _:SiteId(stop) => .K	[anywhere] //TODO: I think this one is wrong. the site call should halt if it has a stop argument, but that doesn't mean '.K'. It means complete execution without publishing. But am I doing that anywhere? How do I do it? I guess it is right to just make it '.K'. So if it is a right-hand of pruning, then left should get stuck if it needs a value from it. That's something my rules already do. But what my rules don't do is when it is the left-hand of otherwise. 'stop;T' should execute 'T'. I think my rules do that too. OK then!
+	rule [Val-stop-3]: _:SiteId(stop) => stop	[anywhere] 
+	rule <k> stop => .K </k>
 	// A rule for halted site calls
 	// rule [stop-handle]:
 		// <k> handle(.K) => .K </k>
@@ -74,7 +75,7 @@ module ORC_ISITES
 	*/
 	syntax ISiteId ::= "if"
 	rule [Site-If-true]: handle(if(true)) 	=> pubHandle(signal)	[macro]
-	rule [Site-If-false]: handle(if(false)) => silentHandle(if(false))	[macro]
+	rule [Site-If-false]: handle(if(false)) => silentHandle(if(false))
 	
 	//@ We make a site \texttt{ifNot} for convenience.
 	syntax ISiteId ::= "ifNot"

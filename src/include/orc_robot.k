@@ -40,7 +40,7 @@ module ORC_ROBOT
 			(botStr(S,"direction") |-> ListItem(0) ListItem(1))
 			(botStr(S,"bot_lock") |-> false)
 			(botStr(S,"is_bumper_hit") |-> false)
-			(botStr(S,"wall_indicator") |-> ListItem(-1) ListItem(-1))
+			(botStr(S,"is_facing_wall") |-> false)
 			(botStr(S,"block_indicator") |-> ListItem(-1) ListItem(-1))
 		</gVars>
 	[structural]
@@ -58,7 +58,7 @@ module ORC_ROBOT
 			(botStr(S,"direction") |-> tuple2Klist(T2))
 			(botStr(S,"bot_lock") |-> false)
 			(botStr(S,"is_bumper_hit") |-> false)
-			(botStr(S,"wall_indicator") |-> ListItem(-1) ListItem(-1))
+			(botStr(S,"is_facing_wall") |-> false)
 			(botStr(S,"block_indicator") |-> ListItem(-1) ListItem(-1))
 		</gVars>
 	[structural]
@@ -108,12 +108,17 @@ module ORC_ROBOT
 	rule 
 		<k> botMoved(S, _) => signal </k> <br/>
 		<gVars>...
+			(PosStr |-> Pos:List)
+			(DirStr |-> Dir:List)		
+			("bot.map_size" |-> Dims:List)
 			(Lock:String |-> (true => false))
-			(Wall:String |-> (_:List => ListItem(-1) ListItem(-1)))
+			(Wall:String |-> (_ => checkWall(Pos,Dir,Dims) ))
 			(Block:String |-> (_:List => ListItem(-1) ListItem(-1)))
 		</gVars>
 		when Lock ==String botStr(S,"bot_lock")
-			andBool Wall ==String botStr(S,"wall_indicator")
+			andBool PosStr ==String botStr(S,"position")
+			andBool DirStr ==String botStr(S,"direction")
+			andBool Wall ==String botStr(S,"is_facing_wall")
 			andBool Block ==String botStr(S,"block_indicator")
 		[structural]
 	
@@ -132,7 +137,7 @@ module ORC_ROBOT
 			 // the arg botHandle is just there to keep the rule TimedHandle-Outro from applying. It could be any dummy argument, but the point is that it is not a Val. 
 		[structural]
 	rule
-		<k> timedHandle(0, bot.scan(S), botHandle) => timedHandle(0, bot.scan(S), (checkWall(vSub(vAdd(Pos,Dir),Dims)) orBool checkBlock(vAdd(Pos,Dir),Obs)) ) </k>
+		<k> timedHandle(0, bot.scan(S), botHandle) => timedHandle(0, bot.scan(S), (checkWall(Pos,Dir,Dims) orBool checkBlock(vAdd(Pos,Dir),Obs)) ) </k>
 		<gVars>...
 			("bot.map_size" |-> Dims:List)
 			("bot.map_obstacles" |-> Obs:List)
@@ -145,7 +150,7 @@ module ORC_ROBOT
 	
 	//@ Define step forward site
 	syntax BotTSite ::= "bot.stepFwd"
-	syntax Bool ::= checkWall(List) [function]
+	syntax Bool ::= checkWall(List,List,List) [function]
 	syntax Bool ::= checkBlock(List,List) [function]
 	
 	
@@ -168,7 +173,7 @@ module ORC_ROBOT
 			// andBool S2 ==String CamelCaseId2String(S) +String ".is_bumper_hit"
 			// andBool S3 ==String CamelCaseId2String(S) +String ".position"
 			// andBool S4 ==String CamelCaseId2String(S) +String ".direction"
-			// andBool S5 ==String CamelCaseId2String(S) +String ".wall_indicator"
+			// andBool S5 ==String CamelCaseId2String(S) +String ".is_facing_wall"
 			// andBool S6 ==String CamelCaseId2String(S) +String ".block_indicator"
 		// [transition]
 		
@@ -190,7 +195,7 @@ module ORC_ROBOT
 			// andBool S2 ==String ((CamelCaseId2String(S)) +String ".is_bumper_hit")
 			// andBool S3 ==String ((CamelCaseId2String(S)) +String ".position")
 			// andBool S4 ==String ((CamelCaseId2String(S)) +String ".direction")
-			// andBool S5 ==String ((CamelCaseId2String(S)) +String ".wall_indicator")
+			// andBool S5 ==String ((CamelCaseId2String(S)) +String ".is_facing_wall")
 			// andBool S6 ==String ((CamelCaseId2String(S)) +String ".block_indicator")
 		// [transition]
 	
@@ -203,7 +208,7 @@ module ORC_ROBOT
 			(Bumper |-> (_ => false))
 			(PosStr |-> Pos:List)
 			(DirStr |-> Dir:List)
-			(Wall |-> (_:List => vSub(vAdd(Pos,Dir),Dims)))
+			(Wall |-> (_:Bool => checkWall(Pos,Dir,Dims)))
 			(Block |-> (_:List => vAdd(Pos,Dir)))
 			("bot.map_obstacles" |-> Obs:List)
 			("bot.map_size" |-> Dims:List)
@@ -212,11 +217,12 @@ module ORC_ROBOT
 			andBool Bumper ==String botStr(S,"is_bumper_hit")
 			andBool PosStr ==String botStr(S,"position")
 			andBool DirStr ==String botStr(S,"direction")
-			andBool Wall ==String botStr(S,"wall_indicator")
+			andBool Wall ==String botStr(S,"is_facing_wall")
 			andBool Block ==String botStr(S,"block_indicator")
 		[transition]
 		
-	rule checkWall(WI) => 1 in WI	[function, anywhere]
+	// rule checkWall(WI) => 0 in WI	[function, anywhere]
+	rule checkWall(Pos,Dir,Dims) => 0 in vSub(vAdd(Pos,Dir),Dims) orBool -1 in vAdd(Pos,Dir)	[function, anywhere]
 	rule checkBlock(BI,Obs) => BI in Obs [function, anywhere]
 	
 	//@ Stepped forward and not hit a wall or block
@@ -225,14 +231,15 @@ module ORC_ROBOT
 		<gVars> 
 			(PosStr |-> (Pos => vAdd(Pos,Dir)))
 			(DirStr |-> Dir)
+			("bot.map_size" |-> Dims:List)
 			("bot.map_obstacles" |-> Obs:List)
-			(Wall |-> WL:List)
+			(Wall |-> WF:Bool)
 			(Block |-> BI:List)
 		...</gVars>
-		when (notBool 1 in WL andBool notBool BI in Obs)
+		when (notBool WF andBool notBool BI in Obs)
 			andBool (PosStr ==String botStr(S,"position"))
 			andBool (DirStr ==String botStr(S,"direction"))
-			andBool (Wall ==String botStr(S,"wall_indicator"))
+			andBool (Wall ==String botStr(S,"is_facing_wall"))
 			andBool (Block ==String botStr(S,"block_indicator"))
 		[structural]
 	
@@ -242,12 +249,12 @@ module ORC_ROBOT
 		<gVars>
 			(Bumper |-> (_ => true))
 			"bot.map_obstacles" |-> Obs:List
-			Wall |-> WL:List
+			Wall |-> WF:Bool
 			Block |-> BI:List
 		...</gVars>
-		when (1 in WL orBool BI in Obs)
+		when (WF orBool BI in Obs)
 			andBool (Bumper ==String botStr(S,"is_bumper_hit"))
-			andBool (Wall ==String botStr(S,"wall_indicator"))
+			andBool (Wall ==String botStr(S,"is_facing_wall"))
 			andBool (Block ==String botStr(S,"block_indicator"))
 		[structural]
 

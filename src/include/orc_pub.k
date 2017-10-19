@@ -24,6 +24,19 @@ module ORC_PUB
 			andBool notBool(anyFreeHandle(A))
 	[transition] //TODO DONE make sure that no other rules are writing directly to the publish list.
 	
+	//@ Replicate the previous rule for the case of only one thread. the previous rule will not work because it expects a non empty Bag next to the thread.
+	rule 
+		<threads>
+			<thread>...
+				<k> pubHandle(V:Val) => .K ...</k>
+				<publish>... .List => ListItem(V) </publish>
+			...</thread>
+		</threads>
+		<gVars>... 
+			"publishCount" |-> (I:Int => I +Int 1)
+		...</gVars>
+	[transition]
+	
 	//@ Generic rule to move published values up to managing parent.
 	rule [Push-Published-Value-Up]:
 		<thread>...

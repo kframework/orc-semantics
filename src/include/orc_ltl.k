@@ -40,6 +40,7 @@ module ORC_LTL
                 | "gVarLeq" "(" String "," Int ")" 
                 | "gVarGt" "(" String "," Int ")" 
                 | "gVarGeq" "(" String "," Int ")" 
+				| "gVarExists" "(" String ")"
                 // |  "eq" "(" Id "," Id ")"
                 | "isGPublished" "(" Int ")"
 
@@ -95,6 +96,17 @@ module ORC_LTL
 			...</generatedTop>
 		) => L
 
+		
+  syntax Set ::= "gVarKeys" "(" Bag ")" [function]
+  rule [LTL-gVarKeys]:
+    gVarKeys(
+      <generatedTop>... 
+        <T>...
+          <gVars> M:Map </gVars> 
+        ...</T> 
+      ...</generatedTop>
+    ) => keys(M)
+	
   // Some additional domain functions:
  
   // syntax Int ::= "sumFirstN" "(" Int ")" [function]
@@ -109,6 +121,8 @@ module ORC_LTL
     We are ready now to give the semantics for atomic propositions:
    */
 
+  rule [LTL-gVarExists]: B:Bag |=Ltl gVarExists(S:String) => true requires S in gVarKeys(B) [ltl, anywhere]
+  rule [LTL-gVarExistsNot]: _:Bag |=Ltl gVarExists(_:String) => false  [ltl, owise]
   rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S:String, V:Val) => true requires gVarGet(B, S) ==K V [ltl, anywhere]
   rule [LTL-gVarEq]: gVarEq(S:String, T:Tuple) => gVarEq(S, tuple2Klist(T)) [macro]
   rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S:String, L:List) => true requires gVarGet(B, S) ==K L [ltl, anywhere]

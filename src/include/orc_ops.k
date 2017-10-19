@@ -510,6 +510,39 @@ module ORC_OPS
 	[structural]
 
 	/*@
+	If \texttt{F} is silent,
+	kill the left side child and create a new child thread executing \texttt{G}.
+	This is a cheat. I only made this to make "if(false) ; g" computable easily for my robot example to work. because that is easier than computing "if(b) | ifNot(b)"
+	WARNING: Halting a silent thread. Mixing Halt and Silent. Mixing "stop" and "0".
+	*/
+	// rule [Otherwise-Left-Silent]:
+		// <thread>...
+			// <k> othrCompMgr(G) </k>
+			// <context> Context </context>
+			// <tid> ManagerId </tid>
+		// ...</thread> <br/>
+		// <thread>...
+			// <k> _:SilentHandle  => killed(.K) </k>
+			// <parentId> ManagerId </parentId>
+			// <publish> .List </publish> <br/>
+			// <props>... 
+				// SetItem("othrLeftExp") 
+			// ...</props>
+		// ...</thread> <br/>
+		// (.Bag => <thread>...
+			// <k> G </k>
+			// <context> Context </context>
+			// <tid> !NewId1:Int </tid>
+			// <parentId> ManagerId </parentId> <br/>
+			// <props> 
+				// SetItem("othrRightExp") 
+				// SetItem("publishUp")
+			// </props>			
+		// ...</thread>)
+		// when G =/=K .K
+	// [structural]
+
+	/*@
 	Clean up. After the child that won, whether left or right, has halted, 
 	destroy it and halt the manager.
 	*/

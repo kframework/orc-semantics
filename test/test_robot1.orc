@@ -3,7 +3,10 @@
 ChangeLane(b) := ((bot.rotateRight(b) >> bot.stepFwd(b) >> bot.rotateLeft(b)) | (bot.rotateLeft(b) >> bot.stepFwd(b) >> bot.rotateRight(b)))
 SmartStep(b) :=  bot.scan(b) > isBlocked > (ifNot(isBlocked) >> bot.stepFwd(b) | if(isBlocked) >> ChangeLane(b))
 SmartStep4Ever(b) :=  SmartStep(b) >> SmartStep4Ever(b)
+StepFwd4Ever(b) :=  bot.stepFwd(b) >> StepFwd4Ever(b)
 // SmartStep(b) :=  bot.scan(b) > isBlocked > (if(isBlocked) >> ChangeLane(b) ; bot.stepFwd(b))
+CarefulStep(b) := bot.scan(x) > isBlocked > ( if(isBlocked) >> (bot.rotateRight(x) | bot.rotateLeft(x)) | ifNot(isBlocked) >> bot.stepFwd(x) )
+CarefulStep4Ever(b) := CarefulStep(b) >> CarefulStep4Ever(b)
 // bot.init() >> bot.stepFwd() >> bot.stepFwd() >> bot.rotateLeft() >> bot.stepFwd()
 // bot.mapInit() >> bot.init("myCow") >> (bot.rotateRight("myCow") | bot.rotateLeft("myCow") | bot.stepFwd("myCow")) // WORKING! test with search. should give three solutions. one where the robot rotates right, one rotates left, one moves forward. tested with: --search --pattern "<gVars>... \"bot.myCow.direction\" |-> Dir </gVars>"
 // bot.mapInit() >> (bot.init("myCow") | bot.init("yourCow")) > x > (bot.stepFwd(x)) // This is working as expected. run normally without search.
@@ -24,6 +27,34 @@ SmartStep4Ever(b) :=  SmartStep(b) >> SmartStep4Ever(b)
 // krun35 test\test_robot1.orc --ltlmc "<>Ltl gVarEq(\"bot.yourCow.is_bumper_hit\",false)"
 // bot.mapInit(<6,6>) >> bot.setObstacles(<2,1>,<4,2>) >> bot.init("yourCow",<2,0>,<0,1>) >> SmartStep("yourCow") >> SmartStep("yourCow") >> SmartStep("yourCow") // ltlmc returned true in seconds
 // bot.mapInit() >> bot.setObstacles(<5,1>) >> (bot.init("myCow") | bot.init("yourCow",<5,0>,<0,1>)) > x > SmartStep(x) // ltlmc returns true in seconds
-bot.mapInit(<6,6>) >> bot.setObstacles(<2,1>,<4,2>) >> bot.init("yourCow",<2,0>,<0,1>) > x > (SmartStep(x) >> SmartStep(x)) // ltlmc takes a matter of seconds, return true.
+// bot.mapInit(<6,6>) >> bot.setObstacles(<2,1>,<4,2>) >> bot.init("yourCow",<2,0>,<0,1>) > x > (SmartStep(x) >> SmartStep(x)) // ltlmc takes a matter of seconds, return true.
+//bot.mapInit(<6,6>) >> bot.setObstacles(<2,1>,<4,2>) >> bot.init("yourCow",<2,0>,<0,1>) > x > SmartStep4Ever(x)
+// Instead of using recursion, since my program is always limited by time, I will avoid recursion for simpler analysis
+// bot.mapInit(<6,6>) >> (
+  // bot.setObstacles(<2,1>,<4,2>) >> (
+    // bot.init("yourCow",<2,0>,<0,1>) > x > (
+	  // CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x)
+    // )
+  // )
+// )
+
+// the following command works. use to verify that the program will never cause the bot to hit an obstacle.
+//krun ..\test\test_robot1.orc -cTL=30 -cV=false -w none --ltlmc "[]Ltl (gVarExists(\"bot.yourCow.is_bumper_hit\") =>Ltl gVarEq(\"bot.yourCow.is_bumper_hit\", false))"
+// on the following program it takes 7 minutes
+// bot.mapInit(<3,3>) >> (
+  // bot.setObstacles(<2,1>,<0,2>) >> (
+    // bot.init("yourCow",<2,0>,<0,1>) > x > (
+	  // CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x) >> CarefulStep(x)
+// )))
+
+// For recursive programs like the following, if it never terminates, you need to follow the krun command with --debugger. In such a case, even when the state cannot possibly transition further, it is still not considered a terminal state by K but rather a deadlock state.
+bot.mapInit(<3,3>) >> (
+  bot.setObstacles(<1,1>,<2,2>) >> (
+    bot.init("yourCow",<2,0>,<0,1>) > x > (
+      SmartStep(x) >> SmartStep(x) >> SmartStep(x)
+    )
+  )
+)
+
 
 //======================
