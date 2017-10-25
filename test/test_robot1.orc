@@ -38,7 +38,7 @@ CarefulStep4Ever(b) := CarefulStep(b) >> CarefulStep4Ever(b)
   // )
 // )
 
-// the following command works. use to verify that the program will never cause the bot to hit an obstacle.
+// the following command works. use on the following three prgrams to verify that the program will never cause the bot to hit an obstacle.
 //krun ..\test\test_robot1.orc -cTL=30 -cV=false -w none --ltlmc "[]Ltl (gVarExists(\"bot.yourCow.is_bumper_hit\") =>Ltl gVarEq(\"bot.yourCow.is_bumper_hit\", false))"
 // on the following program it takes 7 minutes
 // bot.mapInit(<3,3>) >> (
@@ -48,13 +48,42 @@ CarefulStep4Ever(b) := CarefulStep(b) >> CarefulStep4Ever(b)
 // )))
 
 // For recursive programs like the following, if it never terminates, you need to follow the krun command with --debugger. In such a case, even when the state cannot possibly transition further, it is still not considered a terminal state by K but rather a deadlock state.
-bot.mapInit(<3,3>) >> (
-  bot.setObstacles(<1,1>,<2,2>) >> (
+// bot.mapInit(<3,3>) >> (
+  // bot.setObstacles(<1,1>,<2,2>) >> (
+    // bot.init("yourCow",<2,0>,<0,1>) > x > (
+      // SmartStep4Ever(x)
+    // )
+  // )
+// )
+
+// We see from the previous example that SmartStep4Ever hits. we verify using the same command for CarefulStep4Ever
+// bot.mapInit(<3,3>) >> (
+  // bot.setObstacles(<1,1>,<2,2>) >> (
+    // bot.init("yourCow",<2,0>,<0,1>) > x > (
+      // CarefulStep4Ever(x)
+    // )
+  // )
+// )
+
+
+// Try a bigger map. Works. for time limit 30, 10 minutes. TL=100, 2:30 hours then crash. TL=50. 43 minutes. on HP Zbook Studio G3.
+bot.mapInit(<10,10>) >> (
+  bot.setObstacles(<1,1>,<1,5>,<2,2>,<2,4>,<2,8>,<3,7>,<3,4>,<3,5>,<4,1>,<4,4>,<4,9>,<5,7>,<7,5>,<7,7>,<8,1>,<8,2>,<8,9>) >> (
     bot.init("yourCow",<2,0>,<0,1>) > x > (
-      SmartStep(x) >> SmartStep(x) >> SmartStep(x)
+      CarefulStep4Ever(x)
     )
   )
 )
+
+
+
+
+// Let's try two robots.. NOT WORKING. Maude crashes. I think my rules don't account for that.
+// bot.mapInit(<10,10>) >> 
+  // bot.setObstacles(<5,5>,<2,2>,<3,3>,<7,3>,<7,8>,<1,6>) >> (
+    // bot.init("bot1", <5,1>,<0,1>) > x > SmartStep(x)
+    // | bot.init("bot2", <1,5>,<1,0>) > y > SmartStep(y)
+  // )
 
 
 //======================

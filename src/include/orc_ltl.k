@@ -32,9 +32,11 @@ module ORC_LTL
                 | "gVarEq" "(" String "," Val ")"
                 | "gVarEq" "(" String "," Tuple ")"
                 | "gVarEq" "(" String "," List ")"
+                | "gVarEq" "(" String "," String ")"
                 | "gVarNeq" "(" String "," Val ")" 
                 | "gVarNeq" "(" String "," Tuple ")" 
                 | "gVarNeq" "(" String "," List ")" 
+                | "gVarNeq" "(" String "," String ")" 
                 // | "logInv" "(" Id "," Id "," Id ")"
                 | "gVarLt" "(" String "," Int ")" 
                 | "gVarLeq" "(" String "," Int ")" 
@@ -126,9 +128,11 @@ module ORC_LTL
   rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S:String, V:Val) => true requires gVarGet(B, S) ==K V [ltl, anywhere]
   rule [LTL-gVarEq]: gVarEq(S:String, T:Tuple) => gVarEq(S, tuple2Klist(T)) [macro]
   rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S:String, L:List) => true requires gVarGet(B, S) ==K L [ltl, anywhere]
+  rule [LTL-gVarEq]: B:Bag |=Ltl gVarEq(S1:String, S2:String) => true requires gVarGet(B, S1) ==K gVarGet(B, S2) [ltl, anywhere]
   rule [LTL-gVarNeq]: B:Bag |=Ltl gVarNeq(S:String, V:Val) => true requires gVarGet(B, S) =/=K V [ltl, anywhere]
   rule [LTL-gVarNeq]: gVarNeq(S:String, T:Tuple) => gVarNeq(S, tuple2Klist(T)) [macro]
   rule [LTL-gVarNeq]: B:Bag |=Ltl gVarNeq(S:String, L:List) => true requires gVarGet(B, S) =/=K L [ltl, anywhere]
+  rule [LTL-gVarNeq]: B:Bag |=Ltl gVarNeq(S1:String, S2:String) => true requires gVarGet(B, S1) =/=K gVarGet(B, S2) [ltl, anywhere]
   rule [LTL-isGPublished]: B:Bag |=Ltl isGPublished(I:Int) => true requires I in gPublishGet(B) [ltl, anywhere]
 
   rule [LTL-gVarLt]: B:Bag |=Ltl gVarLt(S:String, V:Int) => true requires gVarGetInt(B, S) <Int V [ltl, anywhere]

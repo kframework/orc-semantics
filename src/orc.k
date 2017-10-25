@@ -44,7 +44,7 @@ module ORC
 	imports ORC_ISITES
 	imports ORC_TSITES 
 	imports ORC_VARLOOKUP
-	imports ORC_SCOPESHARE
+	imports ORC_VARSCOPE
 	imports ORC_PREDICATES
 	imports ORC_ROBOT
 	imports ORC_MATH
