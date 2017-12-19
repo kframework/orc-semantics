@@ -16,8 +16,8 @@ Orc Language
 The [Orc programming language](https://orc.csres.utexas.edu/index.shtml) is based on the Orc calculus. This semantics does not cover all of the Orc language's constructs. However, because any program of the Orc language can be expressed in Orc calculus, this semantics can effectively be used to execute programs written in the Orc language.
 In this work, the term *Orc* refers to the Orc calculus.
 
-Instructions
-============
+How to Build and Run
+====================
 This version of the Orc semantics uses version 3.5 of the K tool, which is the last version to support the Maude backend. Download it [here](http://github.com/kframework/k/releases/tag/v3.5.2).
 
 After placing K3.5's binaries folder `k/bin` in your environment path, you can use the following commands:
@@ -45,3 +45,7 @@ Following are some tested patterns:
 Following are some wrong ways to write patterns:
 - `<gPublish> ListItem(11) </gPublish>`
 - `<gPublish> _:List </gPublish>`
+
+Sample Orc Programs
+-------------------
+The [test](test) folder contains a number of Orc programs. The ones prefixed with `robot_demo` correspond to published case studies.
