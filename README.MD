@@ -48,4 +48,4 @@ Following are some wrong ways to write patterns:
 
 Sample Orc Programs
 -------------------
-The [test](test) folder contains a number of Orc programs. The ones prefixed with `robot_demo` correspond to published case studies.
+The [test](test) folder contains a number of Orc programs. The ones prefixed with `robot_demo` such as [`robot_demo_1.orc`](test/robot_demo_1.orc) correspond to published case studies.
